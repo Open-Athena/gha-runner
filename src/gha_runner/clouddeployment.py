@@ -167,15 +167,24 @@ class DeployInstance:
         mappings = self.provider.create_instances()
         instance_ids = list(mappings.keys())
         github_labels = list(mappings.values())
+
+        # Log instance details
+        print(f"Created {len(mappings)} instance(s):")
+        for instance_id, label in mappings.items():
+            print(f"  - Instance: {instance_id}, Runner label: {label}")
+
         # Output the instance mapping and labels so the stop action can use them
         self.provider.set_instance_mapping(mappings)
         # Wait for the instance to be ready
-        print("Waiting for instance to be ready...")
+        print("Waiting for instance(s) to be ready...")
         self.provider.wait_until_ready(instance_ids)
-        print("Instance is ready!")
+        print(f"Instance(s) ready: {', '.join(instance_ids)}")
+
         # Confirm the runner is registered with GitHub
-        for label in github_labels:
-            print(f"Waiting for {label}...")
+        for i, (instance_id, label) in enumerate(mappings.items()):
+            print(f"\nWaiting for runner registration ({i+1}/{len(mappings)}):")
+            print(f"  Instance: {instance_id}")
+            print(f"  Label: {label}")
             self.gh.wait_for_runner(label, self.timeout)
 
 

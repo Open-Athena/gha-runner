@@ -277,21 +277,28 @@ class GitHubInstance:
 
         """
         max = time.time() + timeout
+        start_time = time.time()
         try:
             runner = self.get_runner(label)
+            print(f"✓ Runner {label} is already registered")
             return runner
         except MissingRunnerLabel:
-            print(f"Waiting for runner {label}...")
+            print(f"Runner {label} not yet registered with GitHub")
+            print(f"Polling every {wait}s for up to {timeout}s...")
+            attempt = 0
             while True:
+                elapsed = int(time.time() - start_time)
                 if time.time() > max:
                     raise RuntimeError(
-                        f"Timeout reached: Runner {label} not found"
+                        f"Timeout reached after {elapsed}s: Runner {label} not found"
                     )
+                attempt += 1
                 try:
                     runner = self.get_runner(label)
+                    print(f"✓ Runner {label} registered successfully after {elapsed}s")
                     return runner
                 except MissingRunnerLabel:
-                    print(f"Runner {label} not found. Waiting...")
+                    print(f"  [{elapsed}s] Attempt {attempt}: Runner {label} not found. Waiting {wait}s...")
                     time.sleep(wait)
 
     def remove_runner(self, label: str):
