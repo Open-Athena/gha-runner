@@ -276,7 +276,6 @@ class GitHubInstance:
             The runner with the given label.
 
         """
-        max = time.time() + timeout
         start_time = time.time()
         try:
             runner = self.get_runner(label)
@@ -288,7 +287,7 @@ class GitHubInstance:
             attempt = 0
             while True:
                 elapsed = int(time.time() - start_time)
-                if time.time() > max:
+                if time.time() > start_time + timeout:
                     raise RuntimeError(
                         f"Timeout reached after {elapsed}s: Runner {label} not found"
                     )

@@ -1,4 +1,3 @@
-from copy import deepcopy
 from abc import ABC, abstractmethod
 from gha_runner.gh import GitHubInstance, MissingRunnerLabel
 from gha_runner.helper.workflow_cmds import warning, error
@@ -182,7 +181,8 @@ class DeployInstance:
 
         # Confirm the runner is registered with GitHub
         for i, (instance_id, label) in enumerate(mappings.items()):
-            print(f"\nWaiting for runner registration ({i+1}/{len(mappings)}):")
+            print()
+            print(f"Waiting for runner registration ({i+1}/{len(mappings)}):")
             print(f"  Instance: {instance_id}")
             print(f"  Label: {label}")
             self.gh.wait_for_runner(label, self.timeout)
