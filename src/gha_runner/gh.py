@@ -287,7 +287,7 @@ class GitHubInstance:
             attempt = 0
             while True:
                 elapsed = int(time.time() - start_time)
-                if time.time() > start_time + timeout:
+                if elapsed > timeout:
                     raise RuntimeError(
                         f"Timeout reached after {elapsed}s: Runner {label} not found"
                     )
