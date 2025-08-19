@@ -10,7 +10,7 @@ The `gha_runner` is a flexible, cloud-native solution for dynamically provisioni
 - **Dynamic Runner Provisioning**: Spin up and tear down runners on-demand
 
 ## Implementations
-- **AWS** - [start-aws-gha-runner](https://github.com/omsf/start-aws-gha-runner) and [stop-aws-gha-runner](https://github.com/omsf/stop-aws-gha-runner). For more information, see [our AWS docs](aws.md)
+- **AWS** - [ec2-gha](https://github.com/Open-Athena/ec2-gha). For more information, see [aws.md](aws.md).
 
 ## Using this library
 You can install this library from [PyPI](https://pypi.org/project/gha-runner/).
