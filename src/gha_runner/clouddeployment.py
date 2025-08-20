@@ -177,7 +177,28 @@ class DeployInstance:
         # Wait for the instance to be ready
         print("Waiting for instance(s) to be ready...")
         self.provider.wait_until_ready(instance_ids)
-        print(f"Instance(s) ready: {', '.join(instance_ids)}")
+
+        # Get and display instance details if available
+        instance_info = []
+        if hasattr(self.provider, 'get_instance_details'):
+            try:
+                details = self.provider.get_instance_details(instance_ids)
+                for instance_id in instance_ids:
+                    if instance_id in details:
+                        dns_name = details[instance_id].get('PublicDnsName', '')
+                        if dns_name:
+                            instance_info.append(f"{instance_id} ({dns_name})")
+                        else:
+                            instance_info.append(instance_id)
+                    else:
+                        instance_info.append(instance_id)
+            except Exception:
+                # Fallback to just instance IDs if getting details fails
+                instance_info = instance_ids
+        else:
+            instance_info = instance_ids
+
+        print(f"Instance(s) ready: {', '.join(instance_info)}")
 
         # Confirm the runner is registered with GitHub
         for i, (instance_id, label) in enumerate(mappings.items()):
