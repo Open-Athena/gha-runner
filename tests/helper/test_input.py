@@ -8,25 +8,25 @@ import pytest
 
 def test_parse_params_empty():
     env = {}
-    env["INPUT_AWS_IMAGE_ID"] = ""
-    env["INPUT_AWS_INSTANCE_TYPE"] = ""
+    env["INPUT_EC2_IMAGE_ID"] = ""
+    env["INPUT_EC2_INSTANCE_TYPE"] = ""
     env["INPUT_AWS_SUBNET_ID"] = ""
-    env["INPUT_AWS_SECURITY_GROUP_ID"] = ""
+    env["INPUT_EC2_SECURITY_GROUP_ID"] = ""
     env["INPUT_AWS_IAM_ROLE"] = ""
     env["INPUT_AWS_TAGS"] = ""
-    env["INPUT_AWS_REGION_NAME"] = ""
-    env["INPUT_AWS_HOME_DIR"] = ""
+    env["INPUT_AWS_REGION"] = ""
+    env["INPUT_EC2_HOME_DIR"] = ""
     env["INPUT_AWS_LABELS"] = ""
     builder = (
         EnvVarBuilder(env)
-        .update_state("INPUT_AWS_IMAGE_ID", "image_id", allow_empty=True)
-        .update_state("INPUT_AWS_INSTANCE_TYPE", "instance_type", allow_empty=True)
+        .update_state("INPUT_EC2_IMAGE_ID", "image_id", allow_empty=True)
+        .update_state("INPUT_EC2_INSTANCE_TYPE", "instance_type", allow_empty=True)
         .update_state("INPUT_AWS_SUBNET_ID", "subnet_id")
-        .update_state("INPUT_AWS_SECURITY_GROUP_ID", "security_group_id")
+        .update_state("INPUT_EC2_SECURITY_GROUP_ID", "security_group_id")
         .update_state("INPUT_AWS_IAM_ROLE", "iam_role")
         .update_state("INPUT_AWS_TAGS", "tags", is_json=True)
-        .update_state("INPUT_AWS_REGION_NAME", "region_name", allow_empty=True)
-        .update_state("INPUT_AWS_HOME_DIR", "home_dir", allow_empty=True)
+        .update_state("INPUT_AWS_REGION", "region_name", allow_empty=True)
+        .update_state("INPUT_EC2_HOME_DIR", "home_dir", allow_empty=True)
         .update_state("INPUT_AWS_LABELS", "labels")
     )
     params = builder.params
@@ -41,16 +41,16 @@ def test_parse_params_empty():
 
 def test_env_builder():
     env = {}
-    env["INPUT_AWS_IMAGE_ID"] = "ami-1234567890"
-    env["INPUT_AWS_INSTANCE_TYPE"] = "t2.micro"
+    env["INPUT_EC2_IMAGE_ID"] = "ami-1234567890"
+    env["INPUT_EC2_INSTANCE_TYPE"] = "t2.micro"
     env["INPUT_GH_REPO"] = "owner/test"
     env["GITHUB_REPOSITORY"] = "owner/test_other"
     env["INPUT_INSTANCE_COUNT"] = "1"
     env["INPUT_AWS_TAGS"] = '{"Key": "Name", "Value": "test"}'
     builder = (
         EnvVarBuilder(env)
-        .update_state("INPUT_AWS_IMAGE_ID", "image_id")
-        .update_state("INPUT_AWS_INSTANCE_TYPE", "instance_type")
+        .update_state("INPUT_EC2_IMAGE_ID", "image_id")
+        .update_state("INPUT_EC2_INSTANCE_TYPE", "instance_type")
         .update_state("GITHUB_REPOSITORY", "repo")
         .update_state("INPUT_GH_REPO", "repo")
         .update_state("INPUT_INSTANCE_COUNT", "instance_count", type_hint=int)
