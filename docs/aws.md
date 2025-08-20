@@ -89,9 +89,8 @@ By default, AWS accounts have [a quota of 0 for vCPUS for GPU instances](https:/
 name: Test Self-Hosted Runner
 on:
   workflow_dispatch:
-
 jobs:
-  start-aws-runner:
+  ec2:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -107,45 +106,22 @@ jobs:
           aws-region: <your-region-here, for example us-east-1>
       - name: Create cloud runner
         id: aws-start
-        uses: omsf/start-aws-gha-runner@v1.0.0
+        uses: Open-Athena/ec2-gha@v1
         with:
-          aws_image_id: <your-ami-here, for example ami-0d5079d9be06933e5>
-          aws_instance_type: <your instance type here, for example g4dn.xlarge>
-          aws_home_dir: /home/ubuntu
+          ec2_image_id: <your-ami-here, for example ami-0d5079d9be06933e5>
+          ec2_instance_type: <your instance type here, for example g4dn.xlarge>
+          ec2_home_dir: /home/ubuntu
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
   self-hosted-test:
-    runs-on: ${{ fromJSON(needs.start-aws-runner.outputs.instances) }} # This ensures that you only run on the instances you just provisioned
-    needs:
-      - start-aws-runner
+    runs-on: ${{ needs.ec2.outputs.id }}
+    needs: ec2
     steps:
       - uses: actions/checkout@v4
       - name: Print disk usage
         run: "df -h"
       - name: Print Docker details
         run: "docker version || true"
-  stop-aws-runner:
-    runs-on: ubuntu-latest
-    permissions:
-        id-token: write
-        contents: read
-    needs:
-      - start-aws-runner
-      - self-hosted-test
-    if: ${{ always() }}
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: <your-IAM-Role-ARN>
-          aws-region: <your-region-here, for example us-east-1>
-      - name: Stop instances
-        uses: omsf/stop-aws-gha-runner@v1.0.0
-        with:
-          instance_mapping: ${{ needs.start-aws-runner.outputs.mapping }}
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-
 ```
 
 ## Useful Resources
