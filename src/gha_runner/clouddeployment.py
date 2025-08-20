@@ -184,8 +184,16 @@ class DeployInstance:
             print()
             print(f"Waiting for runner registration ({i+1}/{len(mappings)}):")
             print(f"  Instance: {instance_id}")
-            print(f"  Label: {label}")
-            self.gh.wait_for_runner(label, self.timeout)
+
+            # Handle both single runner (string) and multiple runners (list) per instance
+            if isinstance(label, list):
+                print(f"  Labels: {label}")
+                for j, single_label in enumerate(label):
+                    print(f"    Checking runner {j+1}/{len(label)}: {single_label}")
+                    self.gh.wait_for_runner(single_label, self.timeout)
+            else:
+                print(f"  Label: {label}")
+                self.gh.wait_for_runner(label, self.timeout)
 
 
 @dataclass
@@ -243,19 +251,34 @@ class TeardownInstance:
         instance_ids = list(mappings.keys())
         labels = list(mappings.values())
         for label in labels:
-            try:
-                print(f"Removing runner {label}")
-                self.gh.remove_runner(label)
-            # This occurs when we have a runner that might already be shutdown.
-            # Since we are mainly using the ephemeral runners, we expect this to happen
-            except MissingRunnerLabel:
-                print(f"Runner {label} does not exist, skipping...")
-                continue
-            # This is more of the case when we have a failure to remove the runner
-            # This is not a concern for the user (because we will remove the instance anyways),
-            # but we should log it for debugging purposes.
-            except Exception as e:
-                warning(title="Failed to remove runner", message=e)
+            # Handle both single runner (string) and multiple runners (list) per instance
+            if isinstance(label, list):
+                for single_label in label:
+                    try:
+                        print(f"Removing runner {single_label}")
+                        self.gh.remove_runner(single_label)
+                    except MissingRunnerLabel:
+                        # This occurs when we have a runner that might already be shutdown.
+                        # Since we are mainly using the ephemeral runners, we expect this to happen
+                        print(f"Runner {single_label} does not exist, skipping...")
+                    except Exception as e:
+                        # This is more of the case when we have a failure to remove the runner
+                        # This is not a concern for the user (because we will remove the instance anyways),
+                        # but we should log it for debugging purposes.
+                        warning(title="Failed to remove runner", message=e)
+            else:
+                try:
+                    print(f"Removing runner {label}")
+                    self.gh.remove_runner(label)
+                except MissingRunnerLabel:
+                    # This occurs when we have a runner that might already be shutdown.
+                    # Since we are mainly using the ephemeral runners, we expect this to happen
+                    print(f"Runner {label} does not exist, skipping...")
+                except Exception as e:
+                    # This is more of the case when we have a failure to remove the runner
+                    # This is not a concern for the user (because we will remove the instance anyways),
+                    # but we should log it for debugging purposes.
+                    warning(title="Failed to remove runner", message=e)
         print("Removing instances...")
         self.provider.remove_instances(instance_ids)
         print("Waiting for instance to be removed...")
