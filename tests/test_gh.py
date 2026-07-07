@@ -129,9 +129,16 @@ def test_get_runners_error(github_instance):
     responses.add(
         responses.GET,
         "https://api.github.com/repos/test/test/actions/runners",
+        body="server unavailable",
         status=500,
     )
-    with pytest.raises(RunnerListError, match="Error getting runners: *"):
+    with pytest.raises(
+        RunnerListError,
+        match=(
+            "Error getting runners: Error in API call for .*: "
+            "500 Internal Server Error: b'server unavailable'"
+        ),
+    ):
         github_instance.get_runners()
 
 
