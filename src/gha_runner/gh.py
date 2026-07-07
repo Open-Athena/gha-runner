@@ -92,7 +92,8 @@ class GitHubInstance:
         resp: requests.Response = func(endpoint_url, headers=headers, **kwargs)
         if not resp.ok:
             raise RuntimeError(
-                f"Error in API call for {endpoint_url}: " f"{resp.content}"
+                f"Error in API call for {endpoint_url}: "
+                f"{resp.status_code} {resp.reason}: {resp.content}"
             )
         else:
             try:
