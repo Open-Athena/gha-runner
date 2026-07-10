@@ -320,9 +320,7 @@ def test_wait_for_runner_timeout(mock_time, mock_sleep, github_instance):
         with pytest.raises(RuntimeError) as excinfo:
             github_instance.wait_for_runner("test-label", timeout=30)
 
-        assert "Timeout reached: Runner test-label not found" in str(
-            excinfo.value
-        )
+        assert str(excinfo.value) == "Timeout reached after 31s: Runner test-label not found"
         assert mock_sleep.call_count == 1
 
 
