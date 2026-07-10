@@ -14,14 +14,14 @@ jobs:
       environment_name: ${{ steps.release-type.outputs.environment_name }}
       environment_url: ${{ steps.release-type.outputs.environment_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - name: Install build
         run: >-
           python -m
@@ -31,7 +31,7 @@ jobs:
       - name: Build binary wheel and source tarball
         run: python3 -m build
       - name: Store distribution
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gha-runner-dists
           path: dist/
@@ -64,7 +64,7 @@ jobs:
       - name: Debug outputs
         run: echo '${{ toJSON(needs.build.outputs )}}'
       - name: Download the dists
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: gha-runner-dists
           path: dist/
